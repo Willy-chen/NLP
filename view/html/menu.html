@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset='utf-8'>
+        <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+        <title>Menu Page</title>
+        <meta name='viewport' content='width=device-width, initial-scale=1'>
+        <link rel='stylesheet' type='text/css' media='screen' href='../css/menu.css'>
+        <!-- <script src='main.js'></script> -->
+    </head>
+    <body>
+        <!--Tool Bar-->
+        <nav>
+        <div class="menu text-right">
+            <div class="wrapper">
+                <div class="logo">
+                    <h1>SCQA 對話式語音聊天系統</h1>
+                </div>
+                <ul>
+                    <li><a href="menu.html">Home</a></li>
+                    <!-- <li><a href="#">Other Tools...TBA</a></li> -->
+                    <!-- <li><a href="login.html">Login</a></li> -->
+                </ul>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+        </nav>
+        <!--main content-->
+        <div class="search-sec">
+            <div class="wrapper">
+                
+                <div class="center">
+                    <form action="" role="search">
+                        <div>
+                            <label for="search">Search for stuff</label>
+                            <button id="record" type="submit">Record</button>
+                        </div>
+                    </form>
+                </div>
+                <div class="label-text"><br><br><br></div>
+                <div id="sound-clip"></div>
+                <script src="../js/onRecord.js"></script>
+
+            </div>
+
+        </div>
+
+        <div class="main-content">
+            <div class="wrapper">
+                <div class="introduction">
+                    <h1>簡介<hr></h1>
+                </div>
+                <div class="intro-content">
+                    <div>
+                        <p>
+                        以下為此系統的大綱以及介紹。<br>
+                        </p>
+                        <h3> 背景 <hr></h3>
+                        <p>
+                            1. 語音助理的進步 例如: Google 、 Amazon <br>
+                            2. AI以及機器學習變得熱門 <br>
+                            3. 語音辨識已有基礎 <br>
+                            4. 目前已有一些對話機器人 
+                            <font size=4px>例如: Facebook 的 Blenderbot, Microsoft 的小冰.</font><br>
+                        </p>
+                        <h3> 動機 <hr></h3>
+                        <p>
+                        1. (最初) 希望能與機器進行聊天/多輪交談 (閒聊) <br>
+                        2. (進階) 希望能透過機器聊天來協助人們 (助理、網路查詢) <br>
+                        3. (最終) 希望能透過機器聊天來進行如: 心理諮商 (任務型) <br>
+                        </p>
+                        <h3> 語音辨識 <hr></h3>
+                        <p>
+                        - 開源工具庫 Espnet <br>
+                        - Libri Speech 英語語料集 <br>
+                        建立語音辨識系統，並將其辨識結果作為 QA 系統的輸入。 <br>
+                        </p>
+                        <h3> 對話 <hr></h3>
+                        <p>
+                        - 預訓練語言模型 <br>
+                        - 語料集（例如 SQuAD2、CoQA）<br>
+                        進行 SCQA 模型的訓練，並將回答作為輸出。<br>
+                        </p>
+                        <h3> 問答 <hr></h3>
+                        <p> 
+                        - 網路搜尋引擎如: Google 抓取資料 <br>
+                        作為對話模型的輸入，再透過對話模型進行輸出。 <br>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--footer-->
+        <div class="footer">
+            <div class="wrapper">
+                <p class="text-center">2021 All rights reserved, Menu. Developed by <a href="#">Willy-Chen</a></p>
+            </div>
+        </div>
+    </body>
+</html>
