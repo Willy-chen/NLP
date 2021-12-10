@@ -5,6 +5,7 @@ from requests_html  import HTMLSession
 
 # import wikipedia as wiki
 from transformers import AutoModelForQuestionAnswering, BertTokenizer, BertModel, AutoTokenizer, pipeline
+from transformers import T5ForConditionalGeneration, T5Tokenizer
 from collections import OrderedDict
 from bs4 import BeautifulSoup as bs
 from pprint import pprint
@@ -127,7 +128,7 @@ def parse_results(response):
     return output
 
 
-model_name = "peggyhuang/bert-base-uncased-coqa"
+model_name = "kiri-ai/t5-base-qa-summary-emotion"
 
 # a) Get predictions
 # nlp = pipeline('question-answering', model=model_name, tokenizer=model_name)
@@ -139,12 +140,14 @@ model_name = "peggyhuang/bert-base-uncased-coqa"
 # pprint(res)
 
 # b) Load model & tokenizer
-model = AutoModelForQuestionAnswering.from_pretrained(model_name)
-tokenizer = AutoTokenizer.from_pretrained(model_name)
+# model = AutoModelForQuestionAnswering.from_pretrained(model_name)
+# tokenizer = AutoTokenizer.from_pretrained(model_name)
 # tokenizer = BertTokenizer.from_pretrained(model_name)
 # model = BertModel.from_pretrained(model_name)
+model = T5ForConditionalGeneration.from_pretrained(model_name)
+tokenizer = T5Tokenizer.from_pretrained(model_name)
 
-question = 'when did the first finalfantasy release?'
+debug = True
 
 # get passages from wiki
 # results = wiki.search(question)
@@ -155,104 +158,140 @@ question = 'when did the first finalfantasy release?'
 # text = page.content
 # print(f"\nThe {results[0]} Wikipedia article contains {len(text)} characters.")
 
+# from model get output
+def get_answer(question, prev_qa, context):
+    input_text = [f"q: {qa[0]} a: {qa[1]}" for qa in prev_qa]
+    input_text.append(f"q: {question}")
+    input_text.append(f"c: {context}")
+    input_text = " ".join(input_text)
+    features = tokenizer([input_text], return_tensors='pt')
+    tokens = model.generate(input_ids=features['input_ids'], 
+            attention_mask=features['attention_mask'], max_length=64)
+    return tokenizer.decode(tokens[0], skip_special_tokens=True)    
 
-text = ""
 
-query = urllib.parse.quote_plus(question)
-url = f"https://www.google.com/search?q={query}"
-headers = {'User-Agent': ('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 '
-            '(KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36')}
-response = None
+def search_google(question):
+    text = ""
+    query = urllib.parse.quote_plus(question)
+    url = f"https://www.google.co.uk/search?q={query}"
+    headers = {'User-Agent': ('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 '
+                '(KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36')}
+    params = {
+        "gl": "us",
+        "hl": "en",
+        "lr": "lang_en",
+    }
+    response = None
 
-try:
-    session = HTMLSession()
-    response = session.get(url)
-    
-except requests.exceptions.RequestException as e:
-    print(e)
-
-results = parse_results(response)
-
-flag = True
-for result in results:
-    if list(result.keys())[0] != 'title' and list(result.items())[0][1] != None and list(result.items())[0][1] != '':
-        text += ( urllib.parse.unquote(str(list(result.items())[0][1])+'\n'))
-        flag = False
-        break
-
-if flag:
-    for result in results:
-        if list(result.keys())[0] == 'title':
-            text += ( urllib.parse.unquote(str(result['text'])+'\n'))
-
-print(text)
-
-# 1. TOKENIZE THE INPUT
-# note: if you don't include return_tensors='pt' you'll get a list of lists which is easier for 
-# exploration but you cannot feed that into a model. 
-inputs = tokenizer.encode_plus(question, text, return_tensors="pt", return_token_type_ids=True) 
-print(f"This translates into {len(inputs['input_ids'][0])} tokens.")
-# print(inputs)
-# identify question tokens (token_type_ids = 0)
-qmask = inputs['token_type_ids'].lt(1)
-qt = torch.masked_select(inputs['input_ids'], qmask)
-print(f"The question consists of {qt.size()[0]} tokens.")
-
-chunk_size = model.config.max_position_embeddings - qt.size()[0] - 1 # the "-1" accounts for
-# having to add a [SEP] token to the end of each chunk
-print(f"Each chunk will contain {chunk_size - 2} tokens of the Wikipedia article.")
-
-inputs = tokenizer.encode_plus(question, text, return_tensors="pt")
-# create a dict of dicts; each sub-dict mimics the structure of pre-chunked model input
-chunked_input = OrderedDict()
-for k,v in inputs.items():
-    q = torch.masked_select(v, qmask)
-    c = torch.masked_select(v, ~qmask)
-    chunks = torch.split(c, chunk_size)
-
-    for i, chunk in enumerate(chunks):
-        if i not in chunked_input:
-            chunked_input[i] = {}
-
-        thing = torch.cat((q, chunk))
-        if i != len(chunks)-1:
-            if k == 'input_ids':
-                thing = torch.cat((thing, torch.tensor([102])))
-            else:
-                thing = torch.cat((thing, torch.tensor([1])))
-
-        chunked_input[i][k] = torch.unsqueeze(thing, dim=0)
-
-# 2. OBTAIN MODEL SCORES
-# the AutoModelForQuestionAnswering class includes a span predictor on top of the model. 
-# the model returns answer start and end scores for each word in the text
-# answer_start_scores, answer_end_scores = model(**inputs, return_dict=False)
-# answer_start = torch.argmax(answer_start_scores)  # get the most likely beginning of answer with the argmax of the score
-# answer_end = torch.argmax(answer_end_scores) + 1  # get the most likely end of answer with the argmax of the score
-
-# 3. GET THE ANSWER SPAN
-# once we have the most likely start and end tokens, we grab all the tokens between them
-# and convert tokens back to words!
-# ans = tokenizer.convert_tokens_to_string(tokenizer.convert_ids_to_tokens(inputs["input_ids"][0][answer_start:answer_end]))
-
-def convert_ids_to_string(tokenizer, input_ids):
-    return tokenizer.convert_tokens_to_string(tokenizer.convert_ids_to_tokens(input_ids))
-
-answer = ''
-
-# now we iterate over our chunks, looking for the best answer from each chunk
-for _, chunk in chunked_input.items():
-    answer_start_scores, answer_end_scores = model(**chunk, return_dict=False)
-
-    answer_start = torch.argmax(answer_start_scores)
-    answer_end = torch.argmax(answer_end_scores) + 1
-
-    ans = convert_ids_to_string(tokenizer, chunk['input_ids'][0][answer_start:answer_end])
-    
-    # print(ans)
-
-    # if the ans == [CLS] then the model did not find a real answer in this chunk
-    if ans != '[CLS]' and ans != '':
-        answer += ans + " / "
+    try:
+        session = HTMLSession()
+        response = session.get(url, params=params, headers=headers)
         
-print(answer)
+    except requests.exceptions.RequestException as e:
+        print(e)
+
+    results = parse_results(response)
+
+    flag = True
+    for result in results:
+        if list(result.keys())[0] != 'title' and list(result.items())[0][1] != None and list(result.items())[0][1] != '':
+            text += ( urllib.parse.unquote(str(list(result.items())[0][1])+'\n'))
+            flag = False
+            break
+
+    if flag:
+        for result in results:
+            if list(result.keys())[0] == 'title':
+                text += ( urllib.parse.unquote(str(result['text'])+'\n'))
+    
+    return text
+
+
+if __name__=='__main__':
+    prev_qa = []
+    text = ''
+    while 1:
+        question = str(input("Enter your question: "))
+        text += search_google(question)
+
+        if debug: 
+            print(text)
+
+        answer = get_answer(question, prev_qa, text)
+
+        print("Answer: "+answer)
+
+        prev_qa.append([question, answer])
+
+
+
+
+# # 1. TOKENIZE THE INPUT
+# # note: if you don't include return_tensors='pt' you'll get a list of lists which is easier for 
+# # exploration but you cannot feed that into a model. 
+# inputs = tokenizer.encode_plus(question, text, return_tensors="pt", return_token_type_ids=True) 
+# print(f"This translates into {len(inputs['input_ids'][0])} tokens.")
+# # print(inputs)
+# # identify question tokens (token_type_ids = 0)
+# qmask = inputs['token_type_ids'].lt(1)
+# qt = torch.masked_select(inputs['input_ids'], qmask)
+# print(f"The question consists of {qt.size()[0]} tokens.")
+
+# chunk_size = model.config.max_position_embeddings - qt.size()[0] - 1 # the "-1" accounts for
+# # having to add a [SEP] token to the end of each chunk
+# print(f"Each chunk will contain {chunk_size - 2} tokens of the Wikipedia article.")
+
+# inputs = tokenizer.encode_plus(question, text, return_tensors="pt")
+# # create a dict of dicts; each sub-dict mimics the structure of pre-chunked model input
+# chunked_input = OrderedDict()
+# for k,v in inputs.items():
+#     q = torch.masked_select(v, qmask)
+#     c = torch.masked_select(v, ~qmask)
+#     chunks = torch.split(c, chunk_size)
+
+#     for i, chunk in enumerate(chunks):
+#         if i not in chunked_input:
+#             chunked_input[i] = {}
+
+#         thing = torch.cat((q, chunk))
+#         if i != len(chunks)-1:
+#             if k == 'input_ids':
+#                 thing = torch.cat((thing, torch.tensor([102])))
+#             else:
+#                 thing = torch.cat((thing, torch.tensor([1])))
+
+#         chunked_input[i][k] = torch.unsqueeze(thing, dim=0)
+
+# # 2. OBTAIN MODEL SCORES
+# # the AutoModelForQuestionAnswering class includes a span predictor on top of the model. 
+# # the model returns answer start and end scores for each word in the text
+# # answer_start_scores, answer_end_scores = model(**inputs, return_dict=False)
+# # answer_start = torch.argmax(answer_start_scores)  # get the most likely beginning of answer with the argmax of the score
+# # answer_end = torch.argmax(answer_end_scores) + 1  # get the most likely end of answer with the argmax of the score
+
+# # 3. GET THE ANSWER SPAN
+# # once we have the most likely start and end tokens, we grab all the tokens between them
+# # and convert tokens back to words!
+# # ans = tokenizer.convert_tokens_to_string(tokenizer.convert_ids_to_tokens(inputs["input_ids"][0][answer_start:answer_end]))
+
+# def convert_ids_to_string(tokenizer, input_ids):
+#     return tokenizer.convert_tokens_to_string(tokenizer.convert_ids_to_tokens(input_ids))
+
+# answer = ''
+
+# # now we iterate over our chunks, looking for the best answer from each chunk
+# for _, chunk in chunked_input.items():
+#     answer_start_scores, answer_end_scores = model(**chunk, return_dict=False)
+
+#     answer_start = torch.argmax(answer_start_scores)
+#     answer_end = torch.argmax(answer_end_scores) + 1
+
+#     ans = convert_ids_to_string(tokenizer, chunk['input_ids'][0][answer_start:answer_end])
+    
+#     # print(ans)
+
+#     # if the ans == [CLS] then the model did not find a real answer in this chunk
+#     if ans != '[CLS]' and ans != '':
+#         answer += ans + " / "
+        
+# print(answer)
