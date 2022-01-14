@@ -8,6 +8,7 @@ from transformers import AutoModelForQuestionAnswering, BertTokenizer, BertModel
 from transformers import T5ForConditionalGeneration, T5Tokenizer
 from collections import OrderedDict
 from bs4 import BeautifulSoup as bs
+from bs4 import NavigableString
 from pprint import pprint
 
 
@@ -99,14 +100,23 @@ def parse_results(response):
     if support:
         output.append({'support':[]})
         # print(support[0].find(".kno-rdesc")[0].text)
+        items = []
         for it in support:
             tmp = it.find('a')
             if tmp:
                 for iit in tmp:
-                    output[-1]['support'].append(f'[{it.text}]({str(iit.absolute_links.pop())})')                
+                    link = str(iit.absolute_links.pop())
+                    output[-1]['support'].append(f'[{it.text}]({link})')                
+                    item = {
+                        'title': 'support',
+                        'link': link,
+                        'text': it.text
+                    }
+                    items.append(item)  
             else:
                 output[-1]['support'].append(it.text)
 
+        output.extend(items)
     else:
         output.append({'support':None})
 
@@ -196,14 +206,29 @@ def search_google(question):
     for result in results:
         if list(result.keys())[0] != 'title' and list(result.items())[0][1] != None and list(result.items())[0][1] != '':
             text += ( urllib.parse.unquote(str(list(result.items())[0][1])+'\n'))
-            flag = False
+            # flag = False
             break
 
     if flag:
-        for result in results:
+        for result in results[8:10]:
             if list(result.keys())[0] == 'title':
-                text += ( urllib.parse.unquote(str(result['text'])+'\n'))
-    
+                url = result['link']
+                
+                try:
+                    response = requests.get(url, headers=headers)
+                except:
+                    print(url + ' is not valid!')
+                    break
+
+                search_res = response.text
+                search_res = bs(search_res,'html.parser').get_text()
+                if search_res:
+                    for line in search_res.splitlines()[:15]:
+                        line = line.strip()
+                        if line == '' or line == '\n':
+                            continue
+                        text += ( urllib.parse.unquote(line+'\n'))
+
     return text
 
 
@@ -211,8 +236,11 @@ if __name__=='__main__':
     prev_qa = []
     text = ''
     while 1:
-        question = str(input("Enter your question: "))
-        text += search_google(question)
+        question = str(input("Enter your question: ")).lower()
+
+        matches = [True for match in ["it "," he "," her "," that ","which "," his "," she "] if match in question]
+        if True not in matches:
+            text += search_google(question)
 
         if debug: 
             print(text)
