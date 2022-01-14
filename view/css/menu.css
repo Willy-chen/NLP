@@ -6,10 +6,10 @@
     --dur: .3s;
     --color-dark: #2f2f2f;
     --color-light: #fff;
-    --color-brand: #50ce87;
+    --color-brand: rgb(80, 206, 135);
     --color-dark-brand: #50a878;
     --height: 5rem;
-    --btn-width: 70%;
+    --btn-width: 50%;
     --bez: cubic-bezier(0, 0, 0.43, 1.49);
 }
 
@@ -113,11 +113,49 @@
     margin-left: 2em;
 }
 
+canvas {
+  display: block;
+  margin-bottom: 0.5rem;
+}
+.sound-clips {
+flex: 1;
+overflow: auto;
+}
+.clip {
+padding-bottom: 1rem;
+height: 50px;
+display: list-item;
+}
+
+audio {
+width: 100%;
+display: block;
+margin: 1rem auto 0.5rem;
+}
+
+.clip p {
+display: inline-block;
+font-size: 1rem;
+}
+
+.clip button {
+font-size: 1rem;
+position: relative;
+}
+
+button.delete {
+background: #f00;
+padding: 0.5rem 0.75rem;
+font-size: 0.8rem;
+}
 form {
+  display: block;
   position: relative;
   width: 100%;
+  height:  80px;
   background: var(--color-brand);
   border-radius: var(--rad);
+  margin-top: 20px;
 }
 input, button {
   height: var(--height);
@@ -147,6 +185,12 @@ button {
   background: var(--color-brand);
   border-radius: var(--rad) var(--rad) var(--rad) var(--rad);
 }
+button.record {
+    left: 0%;
+}
+button.stop {
+    left: 50%;
+}
 button:hover{
     box-shadow: 0 1px 1px var(--color-dark-brand);
     background: var(--color-dark-brand);
@@ -158,6 +202,11 @@ input:not(:placeholder-shown) {
   border-radius: var(--rad) 0 0 var(--rad);
   width: calc(100% - var(--btn-width));
 }
+.main-controls {
+    padding: 0.5rem 0;
+    /* display: flex;
+    flex-direction: column; */
+  }
 label {
   position: absolute;
   clip: rect(1px, 1px, 1px, 1px);
