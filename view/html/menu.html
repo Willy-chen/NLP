@@ -14,7 +14,7 @@
         <div class="menu text-right">
             <div class="wrapper">
                 <div class="logo">
-                    <h1>SCQA 對話式語音聊天系統</h1>
+                    <h1>KSCQA 對話式語音聊天系統</h1>
                 </div>
                 <ul>
                     <li><a href="menu.html">Home</a></li>
@@ -78,6 +78,12 @@
                             3. 語音辨識已有基礎 <br>
                             4. 目前已有一些對話機器人 
                             <font size=4px>例如: Facebook 的 Blenderbot, Microsoft 的小冰.</font><br>
+                            5. 語音助理在生活中的便利性 <br>
+                            6. 無法進行交談式的溝通 <br>
+                            7. 人們對於資訊和答案的需求 <br>
+                            8. 交談在資訊交換的重要性 <br>
+                            
+                            => 凸顯出 Conversational QA 的重要性
                         </p>
                         <h3> 動機 <hr></h3>
                         <p>
@@ -89,18 +95,21 @@
                         <p>
                         - 開源工具庫 Espnet <br>
                         - Libri Speech 英語語料集 <br>
-                        建立語音辨識系統，並將其辨識結果作為 QA 系統的輸入。 <br>
+                        建立端對端(End-to-End, E2E)英語語音辨識模型，
+                        並將辨識結果作為 QA 系統的輸入。 <br>
                         </p>
-                        <h3> 對話 <hr></h3>
+                        <h3> 答案檢索 <hr></h3>
                         <p>
-                        - 預訓練語言模型 <br>
-                        - 語料集（例如 SQuAD2、CoQA）<br>
-                        進行 SCQA 模型的訓練，並將回答作為輸出。<br>
+                        - 預訓練語言模型 BERT <br>
+                        - 語料集 QUAC、CoQA <br>                                                
+                        進行 CQA 模型的訓練，並根據 KG 的文章選擇答案輸出。 <br>
                         </p>
-                        <h3> 問答 <hr></h3>
+                        <h3> 文章選取 <hr></h3>
                         <p> 
-                        - 網路搜尋引擎如: Google 抓取資料 <br>
-                        作為對話模型的輸入，再透過對話模型進行輸出。 <br>
+                        - 網路搜尋引擎以及 Wikipedia 抓取資料、文章  <br>
+                        - 建構 Knowledge Graph (KG) 選取歷史相關文章
+                        <br>
+                        作為答案檢索的輸入，從中擷取答案。 <br>
                         </p>
                     </div>
                 </div>
@@ -109,7 +118,7 @@
         <!--footer-->
         <div class="footer">
             <div class="wrapper">
-                <p class="text-center">2021 All rights reserved, Menu. Developed by <a href="#">Willy-Chen</a></p>
+                <p class="text-center">2021 All rights reserved, Developed by <a href="#">Willy-Chen</a></p>
             </div>
         </div>
     </body>
