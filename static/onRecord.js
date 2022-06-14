@@ -7,17 +7,14 @@ const canvas = document.querySelector('.visualizer');
 const mainSection = document.querySelector('.main-controls');
 
 // disable stop button while not recording
-
 stop.disabled = true;
 
 // visualiser setup - create web audio api context and canvas
-
 let audioCtx;
 const canvasCtx = canvas.getContext("2d");
 
 
 //main block for doing the audio recording
-
 if (navigator.mediaDevices.getUserMedia) {
   console.log('getUserMedia supported.');
 
@@ -33,7 +30,8 @@ if (navigator.mediaDevices.getUserMedia) {
       mediaRecorder.start();
       console.log(mediaRecorder.state);
       console.log("recorder started");
-      record.style.background = "red";
+      record.style.background = "#50a878";
+      record.textContent = "Recording...";
 
       stop.disabled = false;
       record.disabled = true;
@@ -45,6 +43,7 @@ if (navigator.mediaDevices.getUserMedia) {
       console.log("recorder stopped");
       record.style.background = "";
       record.style.color = "";
+      record.textContent = "Record";
       // mediaRecorder.requestData();
 
       stop.disabled = true;
@@ -54,10 +53,10 @@ if (navigator.mediaDevices.getUserMedia) {
     mediaRecorder.onstop = function(e) {
       console.log("data available after MediaRecorder.stop() called.");
 
-      const clipName = prompt('Enter a name for your sound clip?','My unnamed clip');
+      const clipName = "Temp";//prompt('Enter a name for your sound clip?','Unnamed');
 
-      const clipContainer = document.createElement('article');
-      const clipLabel = document.createElement('p');
+      const clipContainer = document.createElement('section');
+      // const clipLabel = document.createElement('p');
       const audio = document.createElement('audio');
       const deleteButton = document.createElement('button');
 
@@ -66,14 +65,8 @@ if (navigator.mediaDevices.getUserMedia) {
       deleteButton.textContent = 'Delete';
       deleteButton.className = 'delete';
 
-      if(clipName === null) {
-        clipLabel.textContent = 'My unnamed clip';
-      } else {
-        clipLabel.textContent = clipName;
-      }
-
       clipContainer.appendChild(audio);
-      clipContainer.appendChild(clipLabel);
+      // clipContainer.appendChild(clipLabel);
       clipContainer.appendChild(deleteButton);
       soundClips.appendChild(clipContainer);
 
@@ -89,15 +82,15 @@ if (navigator.mediaDevices.getUserMedia) {
         evtTgt.parentNode.parentNode.removeChild(evtTgt.parentNode);
       }
 
-      clipLabel.onclick = function() {
-        const existingName = clipLabel.textContent;
-        const newClipName = prompt('Enter a new name for your sound clip?');
-        if(newClipName === null) {
-          clipLabel.textContent = existingName;
-        } else {
-          clipLabel.textContent = newClipName;
-        }
-      }
+      // clipLabel.onclick = function() {
+      //   const existingName = clipLabel.textContent;
+      //   const newClipName = prompt('Enter a new name for your sound clip?');
+      //   if(newClipName === null) {
+      //     clipLabel.textContent = existingName;
+      //   } else {
+      //     clipLabel.textContent = newClipName;
+      //   }
+      // }
     }
 
     mediaRecorder.ondataavailable = function(e) {
@@ -112,7 +105,7 @@ if (navigator.mediaDevices.getUserMedia) {
   navigator.mediaDevices.getUserMedia(constraints).then(onSuccess, onError);
 
 } else {
-   console.log('getUserMedia not supported on your browser!');
+   console.log('getUserMedia is not supported on your browser!');
 }
 
 function visualize(stream) {
@@ -173,8 +166,10 @@ function visualize(stream) {
 }
 
 window.onresize = function() {
-  canvas.width = mainSection.offsetWidth;
+  canvas.width = mainSection.clientWidth;
 }
+
+window.onload = ()=>{canvas.width = mainSection.clientWidth;};
 
 window.onresize();
 

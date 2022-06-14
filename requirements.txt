@@ -2,4 +2,4 @@ Flask
 requests
 requests_html
 transformers
-BeautifulSoup
+BeautifulSoup4

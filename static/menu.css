@@ -8,7 +8,7 @@
     --color-light: #fff;
     --color-brand: rgb(80, 206, 135);
     --color-dark-brand: #50a878;
-    --height: 5rem;
+    --height: 3.2rem;
     --btn-width: 50%;
     --bez: cubic-bezier(0, 0, 0.43, 1.49);
 }
@@ -35,14 +35,10 @@
 
 .center{
     margin: auto;
-    width: 50%;
+    width: 80%;
     padding: 10px;
 }
 
-.clearfix{
-    float: none;
-    clear: left;
-}
 /*------------------------------------*/
 .menu {
     width: 100%;
@@ -73,10 +69,58 @@
     color: #1e90ff;
 }
 /*------------------------------------*/
-.search-sec{
+.chat-sec{
     background: rgb(0,249,213);
     background: linear-gradient(90deg, rgba(0,249,213,1) 0%, rgba(37,189,167,1) 48%, rgba(0,212,255,1) 100%);
     padding: 2% 0;
+}
+
+.grid{
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 0.5fr 0.5fr;
+    grid-template-rows: 100px 100px 100px 100px 55px;
+    grid-column-gap: 5px;
+    grid-row-gap: 5px;
+}
+
+.chat-box{
+    grid-column-start: 1;
+    grid-column-end: 6;
+    grid-row-start: 1;
+    grid-row-end: 5;
+    border: 2px solid black; 
+}
+
+.record-box{
+    grid-column-start: 1;
+    grid-column-end: 5;
+    grid-row-start: 5;
+    grid-row-end: 6;
+    border : 2px solid black; 
+}
+
+.send-box{
+    grid-column-start: 5;
+    grid-column-end: 6;
+    grid-row-start: 5;
+    grid-row-end: 6;
+    border : 2px solid black; 
+}
+
+.main-controls{
+    float: left;
+    width: 80%;
+}
+
+button.record{
+    float: left;
+    width: 20%;
+    font-size: 1.3rem;
+}
+
+button.stop{
+    width: 100%;
+    font-size: 1.3rem;
 }
 
 .main-content{
@@ -116,53 +160,68 @@
 canvas {
   display: block;
   margin-bottom: 0.5rem;
+  height: 100%;
 }
+
 .sound-clips {
-flex: 1;
-overflow: auto;
+    flex: 1;
+    overflow: auto;
 }
 .clip {
-padding-bottom: 1rem;
-height: 50px;
-display: list-item;
+    padding-bottom: 1rem;
+    height: 100%;
+    display: list-item;
+    width: 90%;
+    margin-left: 15px;
+    list-style:none ;
 }
 
 audio {
-width: 100%;
-display: block;
-margin: 1rem auto 0.5rem;
+    width: 75%;
+    display: block;
+    margin: 1rem auto 0.5rem;
+    float: left;
 }
 
 .clip p {
-display: inline-block;
-font-size: 1rem;
+    display: block;
+    font-size: 1rem;
+    visibility: hidden;
 }
 
 .clip button {
-font-size: 1rem;
-position: relative;
+    font-size: 1rem;
+    position: relative;
+    display: block;
+    float: left;
+    width: 20%;
 }
 
 button.delete {
-background: #f00;
-padding: 0.5rem 0.75rem;
-font-size: 0.8rem;
+    background: rgb(161, 58, 58);
+    padding: 0.5rem 0.75rem;
+    font-size: 0.8rem;
+    margin-top: 15px;
+    margin-left: 3%;
 }
+
 form {
   display: block;
   position: relative;
   width: 100%;
-  height:  80px;
-  background: var(--color-brand);
-  border-radius: var(--rad);
-  margin-top: 20px;
+  height:  100%;
+  /* background: var(--color-brand); */
+  /* border-radius: var(--rad); */
+  /* margin-top: 20px; */
 }
+
 input, button {
   height: var(--height);
   border: 0;
   color: var(--color-dark);
   font-size: 1.8rem;
 }
+
 input[type="search"] {
   outline: 0; 
   width: 100%;
@@ -175,22 +234,24 @@ input[type="search"] {
   z-index: 1;
   position: relative;
 }
+
 button {
   display: block; 
-  position: absolute;
   top: 0;
-  left: 20%;
   width: var(--btn-width);
   font-weight: bold;
   background: var(--color-brand);
-  border-radius: var(--rad) var(--rad) var(--rad) var(--rad);
+  /* border-radius: var(--rad) var(--rad) var(--rad) var(--rad); */
 }
+
 button.record {
     left: 0%;
 }
+
 button.stop {
     left: 50%;
 }
+
 button:hover{
     box-shadow: 0 1px 1px var(--color-dark-brand);
     background: var(--color-dark-brand);
@@ -198,15 +259,19 @@ button:hover{
     box-shadow: 0 1px 1px var(--color-dark);
     color: var(--color-dark);
 }
+
 input:not(:placeholder-shown) {
   border-radius: var(--rad) 0 0 var(--rad);
   width: calc(100% - var(--btn-width));
 }
-.main-controls {
+
+/* .main-controls {
     padding: 0.5rem 0;
-    /* display: flex;
-    flex-direction: column; */
-  }
+    display: flex;
+    flex-direction: column;
+} 
+*/
+
 label {
   position: absolute;
   clip: rect(1px, 1px, 1px, 1px);
@@ -216,6 +281,7 @@ label {
   width: 1px;
   overflow: hidden;
 }
+
 .label-text{
     color: white;
     font-family: sans-serif;
