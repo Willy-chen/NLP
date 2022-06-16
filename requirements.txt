@@ -3,3 +3,5 @@ requests
 requests_html
 transformers
 BeautifulSoup4
+SpeechRecognition
+gTTS

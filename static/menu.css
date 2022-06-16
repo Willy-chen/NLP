@@ -75,7 +75,7 @@
     padding: 2% 0;
 }
 
-.grid{
+.grid1{
     display: grid;
     grid-template-columns: 1fr 1fr 1fr 0.5fr 0.5fr;
     grid-template-rows: 100px 100px 100px 100px 55px;
@@ -107,6 +107,30 @@
     border : 2px solid black; 
 }
 
+.grid2{
+    display: grid;
+    grid-template-columns: 2fr 2fr ;
+    grid-template-rows: 415px;
+    grid-column-gap: 0px;
+    grid-row-gap: 0px;
+}
+
+.chat-box-left{
+    grid-column-start: 1;
+    grid-column-end: 2;
+    grid-row-start: 1;
+    grid-row-end: 2;
+    /* border : 2px solid black;  */
+}
+
+.chat-box-right{
+    grid-column-start: 2;
+    grid-column-end: 3;
+    grid-row-start: 1;
+    grid-row-end: 2;
+    /* border : 2px solid black;  */
+}
+
 .main-controls{
     float: left;
     width: 80%;
@@ -118,7 +142,7 @@ button.record{
     font-size: 1.3rem;
 }
 
-button.stop{
+button.send{
     width: 100%;
     font-size: 1.3rem;
 }
