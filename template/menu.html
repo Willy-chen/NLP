@@ -6,6 +6,7 @@
         <title>Menu Page</title>
         <meta name='viewport' content='width=device-width, initial-scale=1'>
         <link href="{{url_for('static', filename = 'menu.css')}}" rel="stylesheet">
+        <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
     </head>
     <body>
         <!--Tool Bar-->
@@ -30,17 +31,24 @@
                 
                 <div class="center grid1">
                     
-                    <div class="chat-box grid2">
-                        <div class="chat-box-left">
-
+                    <div class="chat-box">
+                        <div class="chat-records">
+                            <div class="row no-gutter">
+                                <div class="col-md-3">
+                                    <div class="chat-bubble chat-bubble--left">
+                                        Hello There!
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row no-gutter">
+                                <div class="col-md-3">
+                                    <div class="chat-bubble chat-bubble--left">
+                                        What do you want to ask today?
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="chat-box-right">
-                            <form>
-                                <section class="sound-clips">
-        
-                                </section>
-                            </form>
-                        </div>
+                        
                     </div>
                     
                     <div class="record-box">
@@ -129,7 +137,7 @@
         <!--footer-->
         <div class="footer">
             <div class="wrapper">
-                <p class="text-center">2021 All rights reserved, Developed by <a href="https://github.com/Willy-chen">Willy-Chen</a></p>
+                <p class="text-center">2022 All rights reserved, Developed by <a href="https://github.com/Willy-chen">Willy-Chen</a></p>
             </div>
         </div>
     </body>

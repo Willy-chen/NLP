@@ -1,8 +1,7 @@
 // set up basic variables for app
-
 const record = document.querySelector('.record');
 const send = document.querySelector('.send');
-const soundClips = document.querySelector('.sound-clips');
+const chatBox = document.querySelector('.chat-box .chat-records')
 const canvas = document.querySelector('.visualizer');
 const mainSection = document.querySelector('.main-controls');
 
@@ -71,7 +70,6 @@ function endRecording() {
     clearTimeout(timeout);
     timeout = null;
     blob = exportWAV();
-  console.log(blob);
     var data = new FormData()
     data.append("audio", blob, 'temp')
 
@@ -82,6 +80,33 @@ function endRecording() {
     }).then(response => response.json()
     ).then(json => {
         console.log(json)
+        var clipContainer = document.querySelectorAll('.chat-bubble--right');
+        clipContainer = clipContainer[clipContainer.length-1];
+        const transcript = document.createElement('div');
+        if (json.data['text'] == '') transcript.textContent = "Sorry, could't understand audio.";
+        else transcript.textContent = "\t "+json.data['text'];
+        clipContainer.appendChild(transcript); 
+        
+        fetch('/predictApp/predict', {
+          method: 'POST',
+          body: json.data['text']
+    
+        }).then(response => response.json()
+        ).then(json => {
+          console.log(json);
+          const row = document.createElement('div');
+          row.classList.add('row'); 
+          row.classList.add('no-gutter');
+          const col = document.createElement('div');
+          col.classList.add('col-md-3');
+          const chatBubble = document.createElement('div');
+          chatBubble.classList.add('chat-bubble');
+          chatBubble.classList.add('chat-bubble--left');
+          chatBubble.textContent = json.data['text'];
+          col.appendChild(chatBubble);
+          row.appendChild(col);
+          chatBox.appendChild(row);
+        });
     });
 }
 var context;
@@ -242,17 +267,35 @@ if (navigator.mediaDevices.getUserMedia) {
       const clipContainer = document.createElement('section');
       // const clipLabel = document.createElement('p');
       const audio = document.createElement('audio');
-      const deleteButton = document.createElement('button');
+      //const deleteButton = document.createElement('button');
+
+      const row = document.createElement('div');
+      row.classList.add('row'); 
+      row.classList.add('no-gutter');
+      const col = document.createElement('div');
+      col.classList.add('col-md-3');
+      col.classList.add('offset-md-9');
+      const chatBubble = document.createElement('div');
+      chatBubble.classList.add('chat-bubble');
+      chatBubble.classList.add('chat-bubble--right');
+      const soundClips = document.createElement('div');
+      soundClips.classList.add('sound-clips');
+
 
       clipContainer.classList.add('clip');
       audio.setAttribute('controls', '');
-      deleteButton.textContent = 'Delete';
-      deleteButton.className = 'delete';
+      audio.setAttribute('id', 'player');
+      // deleteButton.textContent = 'Delete';
+      // deleteButton.className = 'delete';
 
       clipContainer.appendChild(audio);
       // clipContainer.appendChild(clipLabel);
-      clipContainer.appendChild(deleteButton);
+      // clipContainer.appendChild(deleteButton);
       soundClips.appendChild(clipContainer);
+      chatBubble.appendChild(soundClips);
+      col.appendChild(chatBubble);
+      row.appendChild(col);
+      chatBox.appendChild(row);
 
       // audio.controls = true;
       const blob = new Blob(chunks, { 'type' : 'audio/webm; codec=opus' });
@@ -262,10 +305,10 @@ if (navigator.mediaDevices.getUserMedia) {
       audio.src = audioURL;
       // console.log("recorder stopped");
 
-      deleteButton.onclick = function(e) {
-        let evtTgt = e.target;
-        evtTgt.parentNode.parentNode.removeChild(evtTgt.parentNode);
-      }
+      // deleteButton.onclick = function(e) {
+      //   let evtTgt = e.target;
+      //   evtTgt.parentNode.parentNode.removeChild(evtTgt.parentNode);
+      // }
 
     }
 

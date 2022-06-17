@@ -89,6 +89,19 @@
     grid-row-start: 1;
     grid-row-end: 5;
     border: 2px solid black; 
+    overflow-y: scroll;
+    display: flex;
+    flex-direction: column-reverse;   
+}
+
+.chat-box::-webkit-scrollbar {
+    display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.chat-box {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
 }
 
 .record-box{
@@ -107,28 +120,47 @@
     border : 2px solid black; 
 }
 
-.grid2{
-    display: grid;
-    grid-template-columns: 2fr 2fr ;
-    grid-template-rows: 415px;
-    grid-column-gap: 0px;
-    grid-row-gap: 0px;
+.chat-bubble {
+    padding: 10px 14px;
+    background: #eee;
+    margin: 10px 30px;
+    border-radius: 9px;
+    position: relative;
+    /* max-width: 25%; */
+    width: fit-content
 }
 
-.chat-box-left{
-    grid-column-start: 1;
-    grid-column-end: 2;
-    grid-row-start: 1;
-    grid-row-end: 2;
-    /* border : 2px solid black;  */
+.row{
+    width: 100%;
 }
 
-.chat-box-right{
-    grid-column-start: 2;
-    grid-column-end: 3;
-    grid-row-start: 1;
-    grid-row-end: 2;
-    /* border : 2px solid black;  */
+.no-gutters {
+    padding: 0;
+}
+
+.chat-bubble--left {
+    border-right-color: #eee;
+    border-left: 0;
+    float: left;
+    clear: both;
+}
+    
+.chat-bubble--right {
+    float: right;
+    border-left-color: "blue";
+    border-right: 0;      
+    text-align: right;
+    clear:both;
+}
+  
+.col-md-3 {
+    -ms-flex: 0 0 25%;
+    flex: 0 0 25%;
+    max-width: 50%;
+}
+
+.offset-md-9 {
+    margin-left: 75%;
 }
 
 .main-controls{
@@ -190,7 +222,9 @@ canvas {
 .sound-clips {
     flex: 1;
     overflow: auto;
+    width: 100%;
 }
+
 .clip {
     padding-bottom: 1rem;
     height: 100%;
@@ -201,10 +235,11 @@ canvas {
 }
 
 audio {
-    width: 75%;
+    /* width: 100%; */
     display: block;
-    margin: 1rem auto 0.5rem;
+    /* margin: 1rem auto 0.5rem; */
     float: left;
+    zoom: 90%;
 }
 
 .clip p {
@@ -219,14 +254,6 @@ audio {
     display: block;
     float: left;
     width: 20%;
-}
-
-button.delete {
-    background: rgb(161, 58, 58);
-    padding: 0.5rem 0.75rem;
-    font-size: 0.8rem;
-    margin-top: 15px;
-    margin-left: 3%;
 }
 
 form {
@@ -249,7 +276,7 @@ input, button {
 input[type="search"] {
   outline: 0; 
   width: 100%;
-  background: var(--color-light);
+  /* background: var(--color-light); */
   padding: 0 1.6rem;
   border-radius: var(--rad);
   appearance: none; 

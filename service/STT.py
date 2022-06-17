@@ -1,16 +1,19 @@
-from fileinput import filename
 import speech_recognition as sr
 from gtts import gTTS
-# import requests
-import urllib.request
-import sys
+
+# import urllib.request
+# import sys
 import os
-import random
+# import random
+
+__all__ = ['STT']
+
+UPLOAD_FOLDER = "/data/willy/NLP/audios"
 
 class STT():
     def __init__(self, sl, filename):
         self.sl = sl
-        self.filename = filename
+        self.filename = os.path.join(UPLOAD_FOLDER, filename)
         self.recognizer = sr.Recognizer()
     
     def recognize(self):
@@ -19,7 +22,6 @@ class STT():
             try:
                 audio = self.recognizer.record(source)
                 text = self.recognizer.recognize_google(audio, language = self.sl)
-                print(text)
                 return text
             except sr.UnknownValueError:
                 print("Could not understand audio!")
