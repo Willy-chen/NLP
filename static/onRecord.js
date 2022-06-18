@@ -72,7 +72,12 @@ function endRecording() {
     blob = exportWAV();
     var data = new FormData()
     data.append("audio", blob, 'temp')
-
+    var clipContainer = document.querySelectorAll('.chat-bubble--right');
+    clipContainer = clipContainer[clipContainer.length-1];
+    const loadingIcon = document.createElement('div');
+    loadingIcon.classList.add('lds-ellipsis');
+    for (let i=0;i<4;i++) loadingIcon.appendChild(document.createElement('div'));
+    if (clipContainer) clipContainer.appendChild(loadingIcon);
     fetch('/predictApp/upload', {
       method: 'POST',
       body: data
@@ -80,20 +85,15 @@ function endRecording() {
     }).then(response => response.json()
     ).then(json => {
         console.log(json)
-        var clipContainer = document.querySelectorAll('.chat-bubble--right');
-        clipContainer = clipContainer[clipContainer.length-1];
+        loadingIcon.remove();
         const transcript = document.createElement('div');
-        if (json.data['text'] == '') transcript.textContent = "Sorry, could't understand audio.";
-        else transcript.textContent = "\t "+json.data['text'];
-        clipContainer.appendChild(transcript); 
-        
-        fetch('/predictApp/predict', {
-          method: 'POST',
-          body: json.data['text']
-    
-        }).then(response => response.json()
-        ).then(json => {
-          console.log(json);
+        if (json.data['text'] == ''){
+          transcript.textContent = "Sorry, could't understand audio.";
+          clipContainer.appendChild(transcript); 
+        } 
+        else{
+          transcript.textContent = "\t "+json.data['text'];
+          clipContainer.appendChild(transcript); 
           const row = document.createElement('div');
           row.classList.add('row'); 
           row.classList.add('no-gutter');
@@ -102,11 +102,24 @@ function endRecording() {
           const chatBubble = document.createElement('div');
           chatBubble.classList.add('chat-bubble');
           chatBubble.classList.add('chat-bubble--left');
-          chatBubble.textContent = json.data['text'];
           col.appendChild(chatBubble);
           row.appendChild(col);
           chatBox.appendChild(row);
-        });
+          const loadingIcon = document.createElement('div');
+          loadingIcon.classList.add('lds-ellipsis');
+          for (let i=0;i<4;i++) loadingIcon.appendChild(document.createElement('div'));
+          chatBubble.appendChild(loadingIcon);
+          fetch('/predictApp/predict', {
+            method: 'POST',
+            body: json.data['text']
+      
+          }).then(response => response.json()
+          ).then(json => {
+            console.log(json);
+            loadingIcon.remove();
+            chatBubble.textContent = json.data['text'];
+          });
+        }
     });
 }
 var context;
@@ -246,24 +259,7 @@ if (navigator.mediaDevices.getUserMedia) {
     }
 
     send.onclick = function() {
-      mediaRecorder.stop();
-      console.log(mediaRecorder.state);
-      console.log("recorder stopped");
-      record.style.background = "";
-      record.style.color = "";
-      record.textContent = "Record";
-      // mediaRecorder.requestData();
-      endRecording();
-
-      send.disabled = true;
-      record.disabled = false;
-    }
-
-    mediaRecorder.onstop = function(e) {
-      console.log("data available after MediaRecorder.stop() called.");
-
-      const clipName = "Temp";//prompt('Enter a name for your sound clip?','Unnamed');
-
+      
       const clipContainer = document.createElement('section');
       // const clipLabel = document.createElement('p');
       const audio = document.createElement('audio');
@@ -284,7 +280,7 @@ if (navigator.mediaDevices.getUserMedia) {
 
       clipContainer.classList.add('clip');
       audio.setAttribute('controls', '');
-      audio.setAttribute('id', 'player');
+      audio.classList.add('player');
       // deleteButton.textContent = 'Delete';
       // deleteButton.className = 'delete';
 
@@ -297,6 +293,26 @@ if (navigator.mediaDevices.getUserMedia) {
       row.appendChild(col);
       chatBox.appendChild(row);
 
+      mediaRecorder.stop();
+      console.log(mediaRecorder.state);
+      console.log("recorder stopped");
+      record.style.background = "";
+      record.style.color = "";
+      record.textContent = "Record";
+      // mediaRecorder.requestData();
+      endRecording();
+
+      send.disabled = true;
+      record.disabled = false;
+    }
+
+    mediaRecorder.onstop = function(e) {
+      console.log("data available after MediaRecorder.stop() called.");
+
+      const clipName = "Temp";//prompt('Enter a name for your sound clip?','Unnamed');
+
+      var audio = document.querySelectorAll('.player');  
+      audio = audio[audio.length-1];
       // audio.controls = true;
       const blob = new Blob(chunks, { 'type' : 'audio/webm; codec=opus' });
       // chunks = [];
